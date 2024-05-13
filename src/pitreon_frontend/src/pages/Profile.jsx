@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heading, Input, Button } from '@chakra-ui/react'
+import { Input, Button } from '@chakra-ui/react'
 import { LoginButton } from '../components/LoginButton';
 import { useActor } from '../ic/Actors';
+import Layout from '../components/Layout';
 
 export default function Profile() {
     const [name, setName] = useState('');
@@ -21,15 +22,12 @@ export default function Profile() {
     }
 
     return (
-        <>
-            <Heading>Profile page</Heading>
-            <LoginButton />
-            <br />
-            <br />
+        <Layout>
             <Input placeholder='Enter your desired name' value={name} onChange={handleChange} />
             <Button colorScheme='purple' onClick={handleClick}>Create my profile</Button>
             <br />
+            <br />
             <Link to="/"><button className='primary'>link to home page</button></Link>
-        </>
+        </Layout>
     );
 }
