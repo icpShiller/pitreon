@@ -8,6 +8,7 @@ import Error "mo:base/Error";
 import Option "mo:base/Option";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
+import Nat "mo:base/Nat";
 import Types "types";
 actor {
     type Patron = Types.Patron;
@@ -18,15 +19,16 @@ actor {
     public shared ({ caller }) func addPatron(name : Text) : async Result<(), Text> {
         switch (patrons.get(caller)) {
             case (null) {
-                //let random = Random.Finite(await Random.blob());
+                let random = await generateRandomId();
                 let patron : Patron = {
                     created = Time.now();
                     principal = caller;
                     name;
-                    urlParam = name # "-1234";
-                    description = "";
-                    xAccount = "";
-                    ytAccount = "";
+                    urlParam = name # random;
+                    shortDescription = "Ceci est une petite description.";
+                    fullDescription = "Ceci est une très longue description.";
+                    xAccount = "https://x.com/taler_dao";
+                    ytAccount = "https://www.youtube.com/@epicchess2021";
                     //pfImage = null;
                     //bgImage = null;
                     balance = 0;
@@ -40,6 +42,18 @@ actor {
             };
             case (?patron) {
                 return #err("This patron already exists.");
+            };
+        };
+    };
+
+    public shared func generateRandomId() : async Text {
+        let random = Random.Finite(await Random.blob()).range(32);
+        switch (random) {
+            case (null) {
+                return "123456";
+            };
+            case (?random) {
+                return Nat.toText(random);
             };
         };
     };
@@ -74,10 +88,12 @@ actor {
                 let pp : ProtectedPatron = {
                     name = p.name;
                     urlParam = p.urlParam;
-                    description = p.description;
+                    shortDescription = p.shortDescription;
+                    fullDescription = p.fullDescription;
                     xAccount = p.xAccount;
                     ytAccount = p.ytAccount;
                     followerCount = Array.size<ProtectedPatron>(p.followers);
+                    supporterCount = Array.size<ProtectedPatron>(p.supporters);
                 };
                 return ?pp;
             };

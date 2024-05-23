@@ -10,7 +10,8 @@ module {
         principal : Principal;
         name : Text;
         urlParam : Text;
-        description : Text;
+        shortDescription : Text;
+        fullDescription : Text;
         xAccount : Text;
         ytAccount : Text;
         //pfImage : Blob;
@@ -24,9 +25,11 @@ module {
     public type ProtectedPatron = {
         name : Text;
         urlParam : Text;
-        description : Text;
+        shortDescription : Text;
+        fullDescription : Text;
         xAccount : Text;
         ytAccount : Text;
         followerCount : Nat;
+        supporterCount : Nat;
     };
 };
