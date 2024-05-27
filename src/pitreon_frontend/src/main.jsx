@@ -9,6 +9,8 @@ import Profile, {
 import { ChakraProvider } from '@chakra-ui/react';
 import Actors from './ic/Actors';
 import ErrorPage from "./pages/ErrorPage";
+import CreatePatreon from "./pages/CreatePatreon";
+import NotFound from "./pages/NotFound";
 
 const router = createBrowserRouter([
     {
@@ -18,12 +20,16 @@ const router = createBrowserRouter([
     },
     {
         path: "/not-found",
-        element: <ErrorPage />,
+        element: <NotFound />,
     },
     {
         path: "/profile/:profileId",
         element: <Profile />,
         loader: profileLoader,
+    },
+    {
+        path: "/create-patreon",
+        element: <CreatePatreon />,
     },
 ]);
 

@@ -1,6 +1,6 @@
 import { useRouteError } from "react-router-dom";
 import Layout from "../components/Layout";
-import { Center, Heading, Text } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 
 export default function ErrorPage() {
     const error = useRouteError();

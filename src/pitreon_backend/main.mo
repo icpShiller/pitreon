@@ -9,6 +9,7 @@ import Option "mo:base/Option";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
+import Text "mo:base/Text";
 import Types "types";
 actor {
     type Patron = Types.Patron;
@@ -16,17 +17,19 @@ actor {
     type Result<Ok, Err> = Types.Result<Ok, Err>;
     let patrons = HashMap.HashMap<Principal,Patron>(0, Principal.equal, Principal.hash);
 
-    public shared ({ caller }) func addPatron(name : Text) : async Result<(), Text> {
+    public shared ({ caller }) func addPatron(name : Text) : async ?Text {
         switch (patrons.get(caller)) {
             case (null) {
                 let random = await generateRandomId();
+                let urlParam = urlEncode(name) # "-" # random;
                 let patron : Patron = {
                     created = Time.now();
+                    updated = Time.now();
                     principal = caller;
                     name;
-                    urlParam = name # random;
-                    shortDescription = "Ceci est une petite description.";
-                    fullDescription = "Ceci est une très longue description.";
+                    urlParam;
+                    shortDescription = "This is your bio. It should be kept short.";
+                    fullDescription = "This is a long description of yourself, depicting how you are helping ICP grow.";
                     xAccount = "https://x.com/taler_dao";
                     ytAccount = "https://www.youtube.com/@epicchess2021";
                     //pfImage = null;
@@ -38,12 +41,80 @@ actor {
                     supporting = [];
                 };
                 patrons.put(caller, patron);
-                return #ok();
+                return ?urlParam;
             };
             case (?patron) {
-                return #err("This patron already exists.");
+                return null;
             };
         };
+    };
+
+    public shared ({ caller }) func updatePatron({ name : Text; shortDescription : Text; ytAccount : Text; xAccount : Text}) : async ?Text {
+        let patron = patrons.get(caller);
+        switch (patron) {
+            case (?patron) {
+                let updatedPatron : Patron = {
+                    created = patron.created;
+                    updated = Time.now();
+                    principal = patron.principal;
+                    name;
+                    urlParam = patron.urlParam;
+                    shortDescription;
+                    fullDescription = patron.fullDescription;
+                    xAccount;
+                    ytAccount;
+                    //pfImage = null;
+                    //bgImage = null;
+                    balance = patron.balance;
+                    followers = patron.followers;
+                    following = patron.following;
+                    supporters = patron.supporters;
+                    supporting = patron.supporting;
+                };
+                patrons.put(caller, updatedPatron);
+                return ?"Success";
+            };
+            case (null) {
+                return null;
+            };
+        };
+    };
+
+    public shared ({ caller }) func updateFullDescription( fullDescription : Text ) : async ?Text {
+        let patron = patrons.get(caller);
+        switch (patron) {
+            case (?patron) {
+                let updatedPatron : Patron = {
+                    created = patron.created;
+                    updated = Time.now();
+                    principal = patron.principal;
+                    name = patron.name;
+                    urlParam = patron.urlParam;
+                    shortDescription = patron.shortDescription;
+                    fullDescription;
+                    xAccount = patron.xAccount;
+                    ytAccount = patron.ytAccount;
+                    //pfImage = null;
+                    //bgImage = null;
+                    balance = patron.balance;
+                    followers = patron.followers;
+                    following = patron.following;
+                    supporters = patron.supporters;
+                    supporting = patron.supporting;
+                };
+                patrons.put(caller, updatedPatron);
+                return ?"Success";
+            };
+            case (null) {
+                return null;
+            };
+        };
+    };
+
+    func urlEncode(url : Text) : Text {
+        let encodedUrl = Text.replace(Text.trim(url, #char ' '), #char ' ', "-");
+
+        return encodedUrl;
     };
 
     public shared func generateRandomId() : async Text {
@@ -74,10 +145,10 @@ actor {
         let patron = await getPatron(caller);
         switch (patron) {
             case (?patron) {
-                return patron.urlParam;
+                return "/profile/" # patron.urlParam;
             };
             case (null) {
-                return "new";
+                return "/create-patreon";
             }
         };
     };

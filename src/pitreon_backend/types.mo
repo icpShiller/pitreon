@@ -7,6 +7,7 @@ module {
     public type Result<Ok, Err> = Result.Result<Ok, Err>;
     public type Patron = {
         created : Time.Time;
+        updated : Time.Time;
         principal : Principal;
         name : Text;
         urlParam : Text;

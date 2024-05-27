@@ -1,7 +1,6 @@
 import { Menu, MenuList, MenuButton, MenuItem, Button } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useInternetIdentity } from "ic-use-internet-identity";
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useActor } from '../ic/Actors';
 import { CiUser } from "react-icons/ci";
@@ -14,7 +13,7 @@ export function LoginButton() {
     const { isLoggingIn, login, clear, identity } = useInternetIdentity();
     const { actor } = useActor();
     const [principal, setPrincipal] = useState(null);
-    const [profileLink, setProfileLink] = useState('new');
+    const [profileLink, setProfileLink] = useState('/#');
     const [profileLinkDisabled, setProfileLinkDisabled] = useState(true);
   
     // Clear the principal when the identity is cleared
@@ -46,8 +45,8 @@ export function LoginButton() {
                     {ellipsis(principal)}
                 </MenuButton>
                 <MenuList>
-                    <MenuItem disabled={profileLinkDisabled}>
-                        <Link to={'/profile/'+profileLink}>My patreon page</Link>
+                    <MenuItem as='a' href={profileLink} disabled={profileLinkDisabled}>
+                        My patreon page
                     </MenuItem>
                     <MenuItem onClick={clear}>Logout</MenuItem>
                 </MenuList>
