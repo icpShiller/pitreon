@@ -9,6 +9,13 @@ import { FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { pitreon_backend } from '../../../declarations/pitreon_backend';
 import { StateText } from '../components/StateText';
 import { StateHeading } from '../components/StateHeading';
+// ICP balance, transfers, etc.
+//import { icp_ledger_canister } from '../../../declarations/icp_ledger_canister';
+import { createAgent } from "@dfinity/utils";
+import { LedgerCanister, AccountIdentifier } from "@dfinity/ledger-icp";
+import { Principal } from '@dfinity/principal';
+//import { Buffer } from 'buffer/';
+//globalThis.Buffer = Buffer;
 
 export function loader({ params }) {
     return { params };
@@ -27,7 +34,7 @@ export default function Profile() {
     const [followerCount, setFollowerCount] = useState(0);
     const [supporterCount, setSupporterCount] = useState(0);
     const [dataLoaded, setDataLoaded] = useState(false);
-    const [isPageOwner, setIsPageOwner] = useState(false);
+    const [pageOwnership, setPageOwnership] = useState('undetermined');
     const navigate = useNavigate();
     const toast = useToast();
     const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
@@ -37,11 +44,10 @@ export default function Profile() {
     useEffect(() => {
         if (!identity) {
             setPrincipal(undefined);
-            setIsPageOwner(false);
         }
     }, [identity]);
   
-    // Get the principal from the backend when an identity is available
+    // Get profile page information
     useEffect(() => {
         pitreon_backend.getPatronInfo(params.profileId)
         .then((content) => {
@@ -64,17 +70,21 @@ export default function Profile() {
         }).catch((error) => {
             navigate("/not-found");
         });
+    }, []);
+    
+    // Get the principal from the backend when an identity is available
+    useEffect(() => {
         if (actor && identity) {
             // Check whether current user is page owner, so that we can display actions
             actor.isPageOwner(params.profileId)
             .then((isPageOwner) => {
-                if (isPageOwner === true) {       
-                    setIsPageOwner(true);
+                if (isPageOwner === true) {
+                    setPageOwnership('owner');
                 } else {
-                    setIsPageOwner(false);
+                    setPageOwnership('not-owner');
                 }
             }).catch((error) => {
-                setIsPageOwner(false);
+                setPageOwnership('not-owner');
             });
             // Get user principal if none set
             if (!principal) {
@@ -260,12 +270,51 @@ export default function Profile() {
 
     ////////////// DESCRIPTION FORM END //////////////
 
+    ////////////// DONATE START //////////////
+
+    async function handleDonate(e) {
+
+        if (actor) {
+            actor.donate(amount).then((result) => {
+                console.log(result);
+            })
+        }
+
+        /* if (identity && principal) {
+            const agent = await createAgent({
+                identity,
+                //host: HOST,
+              });
+              
+            const { transfer } = LedgerCanister.create({
+                agent,
+                canisterId: process.env.CANISTER_ID_ICP_LEDGER_CANISTER,
+            });
+
+            const accountIdentifier = AccountIdentifier.fromPrincipal({
+                principal: Principal.fromText(principal),
+                //subAccount: principalSubaccount
+            });
+
+            let transferRequest = {
+                to: accountIdentifier,
+                amount: 100000
+            };
+            const block = await transfer(transferRequest);
+            console.log(block);
+        } else {
+            alert("Please log in first.")
+        } */
+    }
+
+    ////////////// DONATE END //////////////
+
     return (
         <Layout>
             <Box w={'100%'} h={'300px'} bgImg={'/defaultbgp.png'} bgSize={'cover'} bgPosition={'center center'} bgRepeat={'no-repeat'}></Box>
             <Grid templateColumns='repeat(9, 1fr)' pt={1}>
                 <GridItem colSpan={3}>
-                    { isPageOwner ? (
+                    { pageOwnership === 'owner' ? (
                         <>
                             <Button pl={4} pt={3} size='sm' variant='link' onClick={onDetailsOpen}>Edit details</Button>
                             <Modal isOpen={isDetailsOpen} onClose={onDetailsClose}>
@@ -349,9 +398,11 @@ export default function Profile() {
                             <Text>{dataLoaded ? followerCount : '...' } follower{followerCount > 0 ? 's' : '' } • {dataLoaded ? supporterCount : '...' } supporter{supporterCount > 0 ? 's' : '' }</Text>
                         </GridItem>
                         <GridItem colSpan={2} >
+                            { pageOwnership === 'not-owner' ? (
                             <Center>
-                                <Button colorScheme='blue'>Login</Button>
-                            </Center>               
+                                <Button onClick={handleDonate} colorScheme='blue'>Donate 1 ICP</Button>
+                            </Center>     
+                            ) : <></>}      
                         </GridItem>
                         <GridItem colSpan={2} >
                             <Center>
@@ -375,7 +426,7 @@ export default function Profile() {
                     <TabPanel fontSize='sm' >
                         <Grid templateColumns='repeat(9, 1fr)'>
                             <GridItem textAlign={'left'} colSpan={2}>
-                                { isPageOwner ? (
+                                { pageOwnership === 'owner' ? (
                                 <>
                                     <Button size='sm' variant='link' onClick={onDescriptionOpen}>Edit description</Button>
                                     <Modal isOpen={isDescriptionOpen} onClose={onDescriptionClose} size='xl'>

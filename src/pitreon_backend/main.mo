@@ -2,20 +2,64 @@ import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Random "mo:base/Random";
-import Nat16 "mo:base/Nat16";
 import Bool "mo:base/Bool";
-import Error "mo:base/Error";
-import Option "mo:base/Option";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
+import Nat64 "mo:base/Nat64";
+import Error "mo:base/Error";
+import Result "mo:base/Result";
 import Types "types";
+import IcpLedger "canister:icp_ledger_canister";
+
+
 actor {
     type Patron = Types.Patron;
     type ProtectedPatron = Types.ProtectedPatron;
-    type Result<Ok, Err> = Types.Result<Ok, Err>;
     let patrons = HashMap.HashMap<Principal,Patron>(0, Principal.equal, Principal.hash);
+    type AccountIdentifier = IcpLedger.AccountIdentifier;
+    type AccountBalanceArgs = IcpLedger.AccountBalanceArgs;
+
+    public shared ({ caller }) func approve(allowance : Nat) : async Result.Result<IcpLedger.BlockIndex, Text> {
+        let approveArgs : IcpLedger.ApproveArgs = {
+            spender = {
+                owner = caller;
+                subaccount = null;
+            };
+            from_subaccount = null;
+            amount = 10000000000000;
+            expected_allowance = ?allowance;
+            expires_at = null;
+            fee = ?10000;
+            memo = null;
+            created_at_time = null;
+        };
+        try {
+            let approvalResult : IcpLedger.ApproveResult = await IcpLedger.icrc2_approve(approveArgs);
+            // check if the approval was successfull
+            switch (approvalResult) {
+                case (#Err(error)) {
+                    return #err("Couldn't transfer funds:\n" # debug_show (error));
+                };
+                case (#Ok(blockIndex)) { return #ok blockIndex };
+            };
+
+        } catch (error) {
+            return #err("Reject message: " # Error.message(error));
+        }
+    };
+
+    public func monitorBalances() : async Text {
+        let marc : AccountIdentifier = await IcpLedger.account_identifier({ owner = Principal.fromText("n76ok-avh63-rv6wf-q4uln-xp2zs-7t3ke-n5dmi-6q6aw-na47f-westg-2qe"); subaccount = null});
+        let pierre : AccountIdentifier = await IcpLedger.account_identifier({ owner = Principal.fromText("lrxp2-af2et-nvs3c-mswyc-solyt-uwzbh-o5dqy-25d2c-m6eyp-kmlsc-tae"); subaccount =  null});
+        let marcAccountBalanceArgs : AccountBalanceArgs = { account = marc };
+        let pierreAccountBalanceArgs : AccountBalanceArgs = { account = pierre };
+        let marcBalance = await IcpLedger.account_balance(marcAccountBalanceArgs);
+        let pierreBalance = await IcpLedger.account_balance(pierreAccountBalanceArgs);
+        return "Marc: " # Nat64.toText(marcBalance.e8s) # "; Pierre: " # Nat64.toText(pierreBalance.e8s);
+    };
+
 
     public shared ({ caller }) func addPatron(name : Text) : async ?Text {
         switch (patrons.get(caller)) {

@@ -11,9 +11,22 @@
       "type": "custom",
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
+    },
     "pitreon_backend": {
       "main": "src/pitreon_backend/main.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "dependencies": [
+          "icp_ledger_canister"
+      ]
     },
     "pitreon_frontend": {
       "dependencies": [
