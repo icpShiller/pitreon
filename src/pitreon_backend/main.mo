@@ -1,3 +1,4 @@
+import IcpLedger "canister:icp_ledger_canister";
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -11,7 +12,6 @@ import Nat64 "mo:base/Nat64";
 import Error "mo:base/Error";
 import Result "mo:base/Result";
 import Types "types";
-import IcpLedger "canister:icp_ledger_canister";
 
 
 actor {
@@ -40,14 +40,21 @@ actor {
             // check if the approval was successfull
             switch (approvalResult) {
                 case (#Err(error)) {
-                    return #err("Couldn't transfer funds:\n" # debug_show (error));
+                    return #err("Couldn't approve funds: " # debug_show (error));
                 };
-                case (#Ok(blockIndex)) { return #ok blockIndex };
+                case (#Ok(blockIndex)) { return #ok(Nat64.fromNat(blockIndex)) };
             };
 
         } catch (error) {
             return #err("Reject message: " # Error.message(error));
         }
+    };
+
+    public shared ({ caller }) func getBalance() : async Text {
+        let account : AccountIdentifier = await IcpLedger.account_identifier({ owner = caller; subaccount = null});
+        let accountBalanceArgs : AccountBalanceArgs = { account };
+        let balance = await IcpLedger.account_balance(accountBalanceArgs);
+        return "Balance: " # Nat64.toText(balance.e8s);
     };
 
     public func monitorBalances() : async Text {

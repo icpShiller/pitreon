@@ -275,7 +275,7 @@ export default function Profile() {
     async function handleDonate(e) {
 
         if (actor) {
-            actor.donate(amount).then((result) => {
+            actor.approve(1500000).then((result) => {
                 console.log(result);
             })
         }
