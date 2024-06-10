@@ -16,27 +16,28 @@ export function LoginButton() {
     const [profileLink, setProfileLink] = useState('/#');
     const [profileLinkDisabled, setProfileLinkDisabled] = useState(true);
   
-    // Clear the principal when the identity is cleared
-    useEffect(() => {
-      if (!identity) setPrincipal(undefined);
-    }, [identity]);
-  
     // Get the principal from the backend when an identity is available
     useEffect(() => {
-        if (identity && actor) {
+        if (actor) {
             actor.getProfileLink().then(
                 (result) => { 
+                    console.log('link defined')
                     setProfileLink(result);
                     setProfileLinkDisabled(false);
                 }
             );
             if (!principal) {
                 actor.whoami().then((p) => {
+                    console.log('principal defined')
                     setPrincipal(p)
-                    });
-                }
+                });
+            } else {
+                console.log('principal not defined')
             }
-    }, [actor, identity, principal]);
+        } else {
+            console.log('identity or actor not defined')
+        }
+    }, [actor, principal]);
   
     if (identity) {
         return (

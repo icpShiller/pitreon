@@ -7,7 +7,7 @@ export default function Home() {
         <Layout>                  
             <br />
             <br />
-            <Link to="/profile/123"><button className='primary'>link to profile</button></Link>
+            <Link to="/create-patreon"><button className='primary'>Create a profile</button></Link>
         </Layout>
     );
 }

@@ -1,4 +1,3 @@
-import IcpLedger "canister:icp_ledger_canister";
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -12,7 +11,7 @@ import Nat64 "mo:base/Nat64";
 import Error "mo:base/Error";
 import Result "mo:base/Result";
 import Types "types";
-
+import IcpLedger "canister:icp_ledger";
 
 actor {
     type Patron = Types.Patron;

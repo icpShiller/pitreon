@@ -12,7 +12,8 @@ import { StateHeading } from '../components/StateHeading';
 // ICP balance, transfers, etc.
 //import { icp_ledger_canister } from '../../../declarations/icp_ledger_canister';
 import { createAgent } from "@dfinity/utils";
-import { LedgerCanister, AccountIdentifier } from "@dfinity/ledger-icp";
+import { AccountIdentifier } from "@dfinity/ledger-icp";
+import { IcrcLedgerCanister } from "@dfinity/ledger-icrc";
 import { Principal } from '@dfinity/principal';
 //import { Buffer } from 'buffer/';
 //globalThis.Buffer = Buffer;
@@ -39,13 +40,6 @@ export default function Profile() {
     const toast = useToast();
     const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
     const { isOpen: isDescriptionOpen, onOpen: onDescriptionOpen, onClose: onDescriptionClose } = useDisclosure();
-  
-    // Clear the principal when the identity is cleared
-    useEffect(() => {
-        if (!identity) {
-            setPrincipal(undefined);
-        }
-    }, [identity]);
   
     // Get profile page information
     useEffect(() => {
@@ -274,11 +268,11 @@ export default function Profile() {
 
     async function handleDonate(e) {
 
-        if (actor) {
+        /* if (actor) {
             actor.approve(1500000).then((result) => {
                 console.log(result);
             })
-        }
+        } */
 
         /* if (identity && principal) {
             const agent = await createAgent({
@@ -286,25 +280,37 @@ export default function Profile() {
                 //host: HOST,
               });
               
-            const { transfer } = LedgerCanister.create({
-                agent,
-                canisterId: process.env.CANISTER_ID_ICP_LEDGER_CANISTER,
+            console.log(agent);
+            console.log(process.env.CANISTER_ID_ICP_LEDGER); */
+        if (actor) {
+
+            const { metadata } = IcrcLedgerCanister.create({
+                actor,
+                canisterId: process.env.CANISTER_ID_ICP_LEDGER,
             });
 
             const accountIdentifier = AccountIdentifier.fromPrincipal({
                 principal: Principal.fromText(principal),
                 //subAccount: principalSubaccount
+                //subAccount: null
             });
+            console.log ("accountIdentifier");
+            console.log (accountIdentifier);
 
-            let transferRequest = {
+            const data = await metadata({});
+            console.log("data");
+            console.log(data);
+
+            /* let transferRequest = {
                 to: accountIdentifier,
                 amount: 100000
             };
             const block = await transfer(transferRequest);
-            console.log(block);
+            console.log(block); */
+
         } else {
             alert("Please log in first.")
-        } */
+        }
     }
 
     ////////////// DONATE END //////////////
