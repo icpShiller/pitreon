@@ -18,7 +18,7 @@ export function LoginButton() {
   
     // Get the principal from the backend when an identity is available
     useEffect(() => {
-        if (actor) {
+        if (actor && identity) {
             actor.getProfileLink().then(
                 (result) => { 
                     console.log('link defined')
@@ -27,10 +27,7 @@ export function LoginButton() {
                 }
             );
             if (!principal) {
-                actor.whoami().then((p) => {
-                    console.log('principal defined')
-                    setPrincipal(p)
-                });
+                setPrincipal(identity.getPrincipal().toText())
             } else {
                 console.log('principal not defined')
             }

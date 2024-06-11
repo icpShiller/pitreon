@@ -34,14 +34,14 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <ChakraProvider>
-        <React.StrictMode>
-            <InternetIdentityProvider>
-                <Actors>
+    <React.StrictMode>
+        <InternetIdentityProvider>
+            <Actors>
+                <ChakraProvider>
                     <RouterProvider router={router} />
-                </Actors>
-            </InternetIdentityProvider>
-        </React.StrictMode>
-    </ChakraProvider>
+                </ChakraProvider>
+            </Actors>
+        </InternetIdentityProvider>
+    </React.StrictMode>
     
 );
