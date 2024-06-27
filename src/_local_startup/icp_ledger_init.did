@@ -26,3 +26,10 @@ dfx deploy icp_ledger --argument "
   })
 "
 // dfx deploy
+
+// find icp_ledger canister id: for instance bkyz2-fmaaa-aaaaa-qaaaq-cai (in logs from first dfx deploy of the icp ledger canister)
+// then paste it into the command below. Also need to get the "vec {...}" value which is accessible using the principal and the account_identifier method of the Candid UI
+// dfx canister call bkyz2-fmaaa-aaaaa-qaaaq-cai transfer '(record { to = vec {246; 206; 18; 189; 15; 202; 252; 236; 227; 59; 239; 155; 150; 113; 152; 147; 40; 107; 42; 31; 209; 165; 92; 197; 163; 232; 69; 31; 99; 118; 45; 22}; memo = 1:nat64; amount = record {e8s = 1_000_000_000 }; fee = record { e8s = 10_000 }; })'
+// dfx canister call bkyz2-fmaaa-aaaaa-qaaaq-cai transfer '(record { to = vec {95; 251; 88; 67; 29; 104; 244; 0; 115; 234; 128; 4; 215; 149; 219; 102; 165; 128; 162; 48; 38; 90; 142; 30; 216; 253; 207; 156; 230; 251; 164; 59}; memo = 1:nat64; amount = record {e8s = 1_000_000_000 }; fee = record { e8s = 10_000 }; })'
+// after having created 4 profiles (marc, pierre, god, vault), fill them in pitreon_ledger/main.mo then deploy only pitreon_ledger using `dfx deploy pitreon_ledger`
+// To transfer after the approval was granted, use: dfx canister call pitreon_ledger transfer '(900000000, "wvuwo-kit73-ntdjm-mcphe-6hlwd-5mny2-3cmdq-eqwrk-mcgwv-y4wnu-gqe")'

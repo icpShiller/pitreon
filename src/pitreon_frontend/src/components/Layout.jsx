@@ -1,4 +1,4 @@
-import { Heading, Grid, GridItem, Wrap, WrapItem, Spacer, Container, Image } from '@chakra-ui/react'
+import { Wrap, WrapItem, Spacer, Container, Image } from '@chakra-ui/react'
 import { LoginButton } from './LoginButton';
 import { Link } from 'react-router-dom';
 

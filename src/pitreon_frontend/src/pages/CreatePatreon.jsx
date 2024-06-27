@@ -31,17 +31,17 @@ export default function CreatePatreon() {
         e.preventDefault();
         setIsCreating(true);
         actor.addPatron(input).then((message) => {
-            if (message.length == 0) {
+            if (message.ok != null) {
+                navigate('/profile/'+message.ok+'?new='+Date.now())
+            } else {
                 setIsCreating(false);
                 toast({
                     title: 'Failed to create a patreon page.',
-                    description: "Looks like the patreon page already exists for this principal.",
+                    description: message.err,
                     status: 'error',
                     duration: 7000,
                     isClosable: true,
                 });
-            } else {
-                navigate('/profile/'+message[0]);
             }
         }).catch((error) => {
             setIsCreating(false);

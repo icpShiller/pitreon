@@ -21,12 +21,16 @@
         }
       }
     },
-    "pitreon_backend": {
-      "main": "src/pitreon_backend/main.mo",
+    "pitreon_ledger": {
+      "main": "src/pitreon_ledger/main.mo",
       "type": "motoko",
       "dependencies": [
           "icp_ledger"
       ]
+    },
+    "pitreon_backend": {
+      "main": "src/pitreon_backend/main.mo",
+      "type": "motoko"
     },
     "pitreon_frontend": {
       "dependencies": [
@@ -42,7 +46,7 @@
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",

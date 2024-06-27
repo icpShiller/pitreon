@@ -11,6 +11,8 @@ process.env.II_URL =
    ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`
    : `https://identity.ic0.app`;
 
+process.env.FETCH_ROOT_KEY = process.env.DFX_NETWORK === "local";
+
 export default defineConfig({
   build: {
     emptyOutDir: true,
@@ -33,6 +35,7 @@ export default defineConfig({
   plugins: [
     react(),
     environment(["II_URL"]),
+    environment(["FETCH_ROOT_KEY"]),
     environment("all", { prefix: "CANISTER_" }),
     environment("all", { prefix: "DFX_" }),
   ],

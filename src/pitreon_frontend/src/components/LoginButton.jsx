@@ -1,6 +1,7 @@
 import { Menu, MenuList, MenuButton, MenuItem, Button } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useInternetIdentity } from "ic-use-internet-identity";
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useActor } from '../ic/Actors';
 import { CiUser } from "react-icons/ci";
@@ -10,31 +11,39 @@ function ellipsis(string) {
 }
 
 export function LoginButton() {
-    const { isLoggingIn, login, clear, identity } = useInternetIdentity();
+    const { isLoggingIn, login, clear, identity, loginStatus } = useInternetIdentity();
     const { actor } = useActor();
     const [principal, setPrincipal] = useState(null);
     const [profileLink, setProfileLink] = useState('/#');
     const [profileLinkDisabled, setProfileLinkDisabled] = useState(true);
+    const navigate = useNavigate();
+
+    // Clear the principal when the identity is cleared
+    useEffect(() => {
+        if (!identity) setPrincipal(undefined);
+      }, [identity]);
   
     // Get the principal from the backend when an identity is available
     useEffect(() => {
         if (actor && identity) {
             actor.getProfileLink().then(
                 (result) => { 
-                    console.log('link defined')
                     setProfileLink(result);
                     setProfileLinkDisabled(false);
                 }
-            );
+            ).catch((error) => {
+                console.log(error)
+            });
             if (!principal) {
                 setPrincipal(identity.getPrincipal().toText())
-            } else {
-                console.log('principal not defined')
             }
-        } else {
-            console.log('identity or actor not defined')
         }
     }, [actor, principal]);
+
+    function handleLogout() {
+        clear()
+        navigate(0)
+    }
   
     if (identity) {
         return (
@@ -46,7 +55,7 @@ export function LoginButton() {
                     <MenuItem as='a' href={profileLink} disabled={profileLinkDisabled}>
                         My patreon page
                     </MenuItem>
-                    <MenuItem onClick={clear}>Logout</MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </MenuList>
             </Menu>
         );
